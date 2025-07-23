@@ -4,6 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 import { 
   Wrench, 
   History, 
@@ -39,13 +40,51 @@ const Dashboard = () => {
     const userData = JSON.parse(sessionUser);
     setUser(userData);
 
-    // Get user balance from localStorage or set default
-    const users = JSON.parse(localStorage.getItem('users') || '[]');
-    const currentUser = users.find((u: any) => u.email === userData.email);
-    if (currentUser) {
-      setSaldo(currentUser.saldo || 0);
+    // Fetch user balance from Supabase if user has ID, otherwise use localStorage
+    if (userData.id) {
+      fetchUserBalance(userData.id);
+    } else {
+      // Fallback to localStorage for users without Supabase ID
+      const users = JSON.parse(localStorage.getItem('users') || '[]');
+      const currentUser = users.find((u: any) => u.email === userData.email);
+      if (currentUser) {
+        setSaldo(currentUser.saldo || 0);
+      }
     }
   }, [navigate]);
+
+  const fetchUserBalance = async (userId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('users')
+        .select('saldo')
+        .eq('id', userId)
+        .single();
+
+      if (error) throw error;
+      if (data) {
+        setSaldo(data.saldo || 0);
+        // Update localStorage with current balance
+        const users = JSON.parse(localStorage.getItem('users') || '[]');
+        const userData = JSON.parse(localStorage.getItem('sessionUser') || '{}');
+        const updatedUsers = users.map((user: any) => 
+          user.email === userData.email 
+            ? { ...user, saldo: data.saldo || 0 }
+            : user
+        );
+        localStorage.setItem('users', JSON.stringify(updatedUsers));
+      }
+    } catch (error) {
+      console.error('Error fetching user balance:', error);
+      // Fallback to localStorage on error
+      const users = JSON.parse(localStorage.getItem('users') || '[]');
+      const userData = JSON.parse(localStorage.getItem('sessionUser') || '{}');
+      const currentUser = users.find((u: any) => u.email === userData.email);
+      if (currentUser) {
+        setSaldo(currentUser.saldo || 0);
+      }
+    }
+  };
 
   const handleLogout = () => {
     localStorage.removeItem('sessionUser');
@@ -118,6 +157,8 @@ const Dashboard = () => {
   const handleMenuClick = (item: any) => {
     if (item.action) {
       item.action();
+    } else if (item.path) {
+      navigate(item.path);
     } else {
       toast({
         title: "Fitur dalam pengembangan",
@@ -215,7 +256,7 @@ const Dashboard = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           <Button 
             className="h-14 bg-gradient-to-r from-primary to-warning hover:from-primary/90 hover:to-warning/90"
-            onClick={() => toast({ title: "Fitur dalam pengembangan", description: "Pesan layanan akan segera tersedia" })}
+            onClick={() => navigate('/services')}
           >
             <Wrench className="w-5 h-5 mr-2" />
             Pesan Layanan
@@ -223,7 +264,7 @@ const Dashboard = () => {
           <Button 
             variant="outline" 
             className="h-14 border-primary text-primary hover:bg-primary/5"
-            onClick={() => toast({ title: "Fitur dalam pengembangan", description: "Top up saldo akan segera tersedia" })}
+            onClick={() => navigate('/topup')}
           >
             <CreditCard className="w-5 h-5 mr-2" />
             Top Up Saldo

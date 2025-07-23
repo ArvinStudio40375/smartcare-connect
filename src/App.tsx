@@ -7,6 +7,13 @@ import Splash from "./pages/Splash";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
+import Services from "./pages/Services";
+import Orders from "./pages/Orders";
+import Chat from "./pages/Chat";
+import TopUp from "./pages/TopUp";
+import Balance from "./pages/Balance";
+import Bills from "./pages/Bills";
+import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -22,7 +29,13 @@ const App = () => (
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/dashboard" element={<Dashboard />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+          <Route path="/services" element={<Services />} />
+          <Route path="/orders" element={<Orders />} />
+          <Route path="/chat" element={<Chat />} />
+          <Route path="/topup" element={<TopUp />} />
+          <Route path="/balance" element={<Balance />} />
+          <Route path="/bills" element={<Bills />} />
+          <Route path="/profile" element={<Profile />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
