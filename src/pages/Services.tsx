@@ -58,7 +58,7 @@ const Services = () => {
         .insert({
           user_id: userData.id,
           layanan_id: service.id,
-          mitra_id: 'default-mitra', // Default mitra ID - could be updated later
+          mitra_id: null, // Will be assigned later by admin
           nominal: service.base_price,
           status: 'pending',
           order_date: new Date().toISOString()
