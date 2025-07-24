@@ -54,37 +54,43 @@ const Services = () => {
     console.log('User data:', userData); // Debug log
 
     try {
-      // First, ensure user exists in Supabase users table
-      const { data: existingUser } = await supabase
+      // Generate UUID if user doesn't have one
+      let userId = userData.id;
+      if (!userId) {
+        userId = crypto.randomUUID();
+        // Update localStorage with the new ID
+        userData.id = userId;
+        localStorage.setItem('sessionUser', JSON.stringify(userData));
+      }
+
+      // Ensure user exists in Supabase users table
+      const { data: existingUser, error: checkError } = await supabase
         .from('users')
         .select('id')
-        .eq('id', userData.id)
-        .single();
+        .eq('id', userId)
+        .maybeSingle();
 
-      if (!existingUser) {
+      if (!existingUser && !checkError) {
         // Create user in Supabase if doesn't exist
         const { error: userError } = await supabase
           .from('users')
           .insert({
-            id: userData.id,
+            id: userId,
             nama: userData.nama,
             email: userData.email,
             saldo: 0
           });
 
-        if (userError) {
-          console.error('Error creating user:', userError);
-          throw userError;
-        }
+        if (userError) throw userError;
       }
 
       // Now create the order
       const { error } = await supabase
         .from('tagihan')
         .insert({
-          user_id: userData.id,
+          user_id: userId,
           layanan_id: service.id,
-          mitra_id: null, // Will be assigned later by admin
+          mitra_id: null,
           nominal: service.base_price,
           status: 'pending',
           order_date: new Date().toISOString()

@@ -41,7 +41,7 @@ const Orders = () => {
         .from('tagihan')
         .select(`
           *,
-          layanan (nama_layanan)
+          layanan!tagihan_layanan_id_fkey (nama_layanan)
         `)
         .eq('user_id', userData.id)
         .order('order_date', { ascending: false });
