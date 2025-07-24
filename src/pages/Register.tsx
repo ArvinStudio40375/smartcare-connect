@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "@/hooks/use-toast";
 import { Eye, EyeOff, Mail, Lock, User } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
 const Register = () => {
   const [nama, setNama] = useState("");
@@ -42,9 +43,10 @@ const Register = () => {
         return;
       }
 
-      // Add new user
+      // Add new user to localStorage
+      const userId = crypto.randomUUID();
       const newUser = {
-        id: Date.now().toString(),
+        id: userId,
         nama,
         email,
         password,
@@ -54,6 +56,21 @@ const Register = () => {
 
       users.push(newUser);
       localStorage.setItem('users', JSON.stringify(users));
+
+      // Also add user to Supabase
+      try {
+        await supabase
+          .from('users')
+          .insert({
+            id: userId,
+            nama,
+            email,
+            saldo: 0
+          });
+      } catch (supabaseError) {
+        console.error('Error creating user in Supabase:', supabaseError);
+        // Continue anyway since we're using localStorage for auth
+      }
 
       toast({
         title: "Pendaftaran berhasil!",
