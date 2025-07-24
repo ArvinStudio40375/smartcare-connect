@@ -185,13 +185,111 @@ export type Database = {
           },
         ]
       }
+      penarikan: {
+        Row: {
+          account_name: string | null
+          account_number: string | null
+          bank_name: string | null
+          created_at: string
+          id: string
+          mitra_id: string
+          nominal: number
+          notes: string | null
+          processed_at: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          account_name?: string | null
+          account_number?: string | null
+          bank_name?: string | null
+          created_at?: string
+          id?: string
+          mitra_id: string
+          nominal: number
+          notes?: string | null
+          processed_at?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          account_name?: string | null
+          account_number?: string | null
+          bank_name?: string | null
+          created_at?: string
+          id?: string
+          mitra_id?: string
+          nominal?: number
+          notes?: string | null
+          processed_at?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_penarikan_mitra"
+            columns: ["mitra_id"]
+            isOneToOne: false
+            referencedRelation: "mitra"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pesanan: {
+        Row: {
+          created_at: string
+          email_pengguna: string
+          id: string
+          id_layanan: string
+          jumlah: number
+          status: string
+          tanggal: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          email_pengguna: string
+          id?: string
+          id_layanan: string
+          jumlah?: number
+          status?: string
+          tanggal?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          email_pengguna?: string
+          id?: string
+          id_layanan?: string
+          jumlah?: number
+          status?: string
+          tanggal?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_pesanan_layanan"
+            columns: ["id_layanan"]
+            isOneToOne: false
+            referencedRelation: "layanan"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pesanan_layanan_fk"
+            columns: ["id_layanan"]
+            isOneToOne: false
+            referencedRelation: "layanan"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tagihan: {
         Row: {
           completion_date: string | null
           created_at: string
           id: string
           layanan_id: string
-          mitra_id: string
+          mitra_id: string | null
           nominal: number
           order_date: string
           payment_method: string | null
@@ -206,7 +304,7 @@ export type Database = {
           created_at?: string
           id?: string
           layanan_id: string
-          mitra_id: string
+          mitra_id?: string | null
           nominal: number
           order_date?: string
           payment_method?: string | null
@@ -221,7 +319,7 @@ export type Database = {
           created_at?: string
           id?: string
           layanan_id?: string
-          mitra_id?: string
+          mitra_id?: string | null
           nominal?: number
           order_date?: string
           payment_method?: string | null
@@ -232,6 +330,20 @@ export type Database = {
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "fk_tagihan_layanan"
+            columns: ["layanan_id"]
+            isOneToOne: false
+            referencedRelation: "layanan"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_tagihan_mitra"
+            columns: ["mitra_id"]
+            isOneToOne: false
+            referencedRelation: "mitra"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "tagihan_layanan_id_fkey"
             columns: ["layanan_id"]
@@ -305,6 +417,7 @@ export type Database = {
           phone_number: string | null
           profile_picture_url: string | null
           saldo: number
+          status: string | null
           updated_at: string
         }
         Insert: {
@@ -315,6 +428,7 @@ export type Database = {
           phone_number?: string | null
           profile_picture_url?: string | null
           saldo?: number
+          status?: string | null
           updated_at?: string
         }
         Update: {
@@ -325,6 +439,7 @@ export type Database = {
           phone_number?: string | null
           profile_picture_url?: string | null
           saldo?: number
+          status?: string | null
           updated_at?: string
         }
         Relationships: []
