@@ -53,14 +53,36 @@ const Services = () => {
     const userData = JSON.parse(sessionUser);
     console.log('User data:', userData); // Debug log
 
-    // Generate a UUID for user_id if it doesn't exist
-    const userId = userData.id || crypto.randomUUID();
-
     try {
+      // First, ensure user exists in Supabase users table
+      const { data: existingUser } = await supabase
+        .from('users')
+        .select('id')
+        .eq('id', userData.id)
+        .single();
+
+      if (!existingUser) {
+        // Create user in Supabase if doesn't exist
+        const { error: userError } = await supabase
+          .from('users')
+          .insert({
+            id: userData.id,
+            nama: userData.nama,
+            email: userData.email,
+            saldo: 0
+          });
+
+        if (userError) {
+          console.error('Error creating user:', userError);
+          throw userError;
+        }
+      }
+
+      // Now create the order
       const { error } = await supabase
         .from('tagihan')
         .insert({
-          user_id: userId,
+          user_id: userData.id,
           layanan_id: service.id,
           mitra_id: null, // Will be assigned later by admin
           nominal: service.base_price,
