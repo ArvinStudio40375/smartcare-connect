@@ -68,12 +68,13 @@ const Chat = () => {
     if (!newMessage.trim() || !user) return;
 
     try {
+      const adminId = crypto.randomUUID();
       const { error } = await supabase
         .from('chat')
         .insert({
           sender_id: user.id,
           sender_type: 'user',
-          receiver_id: 'admin', // Default to admin
+          receiver_id: adminId,
           receiver_type: 'admin',
           message: newMessage.trim()
         });

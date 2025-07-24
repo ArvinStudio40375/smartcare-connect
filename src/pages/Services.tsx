@@ -51,28 +51,22 @@ const Services = () => {
     }
 
     const userData = JSON.parse(sessionUser);
-    console.log('User data:', userData); // Debug log
 
     try {
-      // Generate UUID if user doesn't have one
-      let userId = userData.id;
-      if (!userId) {
-        userId = crypto.randomUUID();
-        // Update localStorage with the new ID
-        userData.id = userId;
-        localStorage.setItem('sessionUser', JSON.stringify(userData));
-      }
-
-      // Ensure user exists in Supabase users table
-      const { data: existingUser, error: checkError } = await supabase
+      // Find user by email first
+      const { data: existingUser, error: findError } = await supabase
         .from('users')
         .select('id')
-        .eq('id', userId)
+        .eq('email', userData.email)
         .maybeSingle();
 
-      if (!existingUser && !checkError) {
-        // Create user in Supabase if doesn't exist
-        const { error: userError } = await supabase
+      let userId;
+      if (existingUser) {
+        userId = existingUser.id;
+      } else {
+        // Create new user
+        userId = crypto.randomUUID();
+        const { error: createError } = await supabase
           .from('users')
           .insert({
             id: userId,
@@ -80,11 +74,15 @@ const Services = () => {
             email: userData.email,
             saldo: 0
           });
-
-        if (userError) throw userError;
+        
+        if (createError) throw createError;
       }
 
-      // Now create the order
+      // Update localStorage with user ID
+      userData.id = userId;
+      localStorage.setItem('sessionUser', JSON.stringify(userData));
+
+      // Create order
       const { error } = await supabase
         .from('tagihan')
         .insert({
