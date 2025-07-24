@@ -51,12 +51,16 @@ const Services = () => {
     }
 
     const userData = JSON.parse(sessionUser);
+    console.log('User data:', userData); // Debug log
+
+    // Generate a UUID for user_id if it doesn't exist
+    const userId = userData.id || crypto.randomUUID();
 
     try {
       const { error } = await supabase
         .from('tagihan')
         .insert({
-          user_id: userData.id,
+          user_id: userId,
           layanan_id: service.id,
           mitra_id: null, // Will be assigned later by admin
           nominal: service.base_price,

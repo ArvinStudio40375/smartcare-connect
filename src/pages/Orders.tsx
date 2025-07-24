@@ -11,7 +11,7 @@ interface Order {
   id: string;
   layanan: {
     nama_layanan: string;
-  };
+  } | null;
   nominal: number;
   status: string;
   order_date: string;
@@ -47,7 +47,7 @@ const Orders = () => {
         .order('order_date', { ascending: false });
 
       if (error) throw error;
-      setOrders(data || []);
+      setOrders((data as any) || []);
     } catch (error) {
       console.error('Error fetching orders:', error);
       toast({

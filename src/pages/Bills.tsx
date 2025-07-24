@@ -11,7 +11,7 @@ interface Bill {
   id: string;
   layanan: {
     nama_layanan: string;
-  };
+  } | null;
   nominal: number;
   status: string;
   order_date: string;
@@ -48,7 +48,7 @@ const Bills = () => {
         .order('order_date', { ascending: false });
 
       if (error) throw error;
-      setBills(data || []);
+      setBills((data as any) || []);
     } catch (error) {
       console.error('Error fetching bills:', error);
       toast({

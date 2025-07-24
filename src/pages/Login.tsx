@@ -24,6 +24,7 @@ const Login = () => {
 
       if (user) {
         localStorage.setItem('sessionUser', JSON.stringify({
+          id: user.id,
           email: user.email,
           nama: user.nama
         }));
